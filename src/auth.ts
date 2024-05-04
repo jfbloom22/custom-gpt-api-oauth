@@ -2,7 +2,13 @@ import { User } from '@prisma/client';
 import { ClerkUser } from './types/types';
 import { prisma } from './utils/db';
 import NodeCache from 'node-cache'
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request as ExpressRequest, Response } from 'express';
+
+interface Request extends ExpressRequest {
+  user?: {
+    id: string;
+  }
+}
 
 const tokenCache = new NodeCache({ stdTTL: 3600 })
 
