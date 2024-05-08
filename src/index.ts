@@ -1,14 +1,10 @@
-import express, { Request as ExpressRequest, Response } from "express";
+import express, { Response } from "express";
 import { prisma } from "./utils/db";
 import { authenticateToken } from "./auth";
 import morgan from "morgan";
 
 const app = express();
-interface Request extends ExpressRequest {
-  user?: {
-    id: string;
-  };
-}
+
 
 app.use(express.json());
 app.use(morgan('dev'));

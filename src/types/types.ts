@@ -1,3 +1,5 @@
+import express, { Request as ExpressRequest } from "express";
+
 export interface ClerkUser {
     object: string
     instance_id: string
@@ -13,3 +15,9 @@ export interface ClerkUser {
     private_metadata: object
     unsafe_metadata: object
 }
+
+export interface Request extends ExpressRequest {
+    user?: {
+      id: string;
+    };
+  }
