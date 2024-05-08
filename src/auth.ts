@@ -13,6 +13,7 @@ interface Request extends ExpressRequest {
 const tokenCache = new NodeCache({ stdTTL: 3600 })
 
 // middleware to verify token
+// since we are using Clerk REST API to verify the token and retrieve the user info, lets cache the API calls
 export const authenticateToken = async (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {

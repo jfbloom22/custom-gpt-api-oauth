@@ -25,7 +25,7 @@ model Store {
   updatedAt DateTime  @updatedAt
   userId    String
   user      User      @relation(fields: [userId], references: [id])
-  product   Product[]
+  products  Product[]
 }
 
 model Product {

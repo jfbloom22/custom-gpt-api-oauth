@@ -57,6 +57,16 @@ app.get('/stores', async (req: Request, res: Response) => {
   res.json(stores);
 });
 
+// Endpoint to fetch a store by id and all it's products
+app.get('/stores/:id', async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const store = await prisma.store.findUnique({
+    where: { id },
+    include: { products: true },
+  });
+  res.json(store);
+});
+
 // Endpoint to create a new product
 app.post('/products', async (req: Request, res: Response) => {
   const { name, type, meta, storeId } = req.body;
