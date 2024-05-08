@@ -1,9 +1,12 @@
 # custom-gpt-api-oauth
 
 ## Description 
-a starting point for enhancing Custom GPTs with user authentication and the ability to read and write to a database.  
+Example OpenAI Custom GPT with user authentication and the ability to read and write to a database.  
 
-As an example this project will use use Prisma with Neon Serverless Postgres.  For authentication: Clerk oAuth 2 server.  It will also automatically generate open API specs using swagger.  
+Database: Prisma with Neon Serverless Postgres
+Authentication: Clerk oAuth 2 server.
+
+Additional features: automatically generate open API specs using swagger.  
 
 ## Prisma
 `npx prisma generate` - this will generate the Prisma client
@@ -17,3 +20,8 @@ What I am loving about Prisma is being able to generate the Types, restart my Ty
 
 ### How to use Prisma Studio
 `npx prisma studio` - this will open the Prisma Studio in your browser.  You can use this to visually see the database schema and relationships.
+
+
+## Getting Started
+
+`pnpm install`
