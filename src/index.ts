@@ -38,33 +38,50 @@ app.post(
   }
 );
 
-// Endpoint to fetch all stores
-app.get("/stores", async (req: Request, res: Response) => {
-  const stores = await prisma.store.findMany();
+// Endpoint to fetch all stores beloging to the user
+app.get("/stores", [authenticateToken], async (req: Request, res: Response) => {
+  if (!req.user) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+  const userId = req.user.id;
+  const stores = await prisma.store.findMany({ where: { userId } });
   res.json(stores);
 });
 
 // Endpoint to fetch a store by id and all it's products
-app.get("/stores/:id", async (req: Request, res: Response) => {
+app.get("/stores/:id",   [authenticateToken], async (req: Request, res: Response) => {
+  if (!req.user) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
   const { id } = req.params;
   const store = await prisma.store.findUnique({
-    where: { id },
+    where: { id, userId: req.user.id },
     include: { products: true },
   });
   res.json(store);
 });
 
 // Endpoint to delete a store by id
-app.delete("/stores/:id", async (req: Request, res: Response) => {
+app.delete("/stores/:id",   [authenticateToken],async (req: Request, res: Response) => {
+  if (!req.user) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
   const { id } = req.params;
   const store = await prisma.store.delete({
-    where: { id },
+    where: { id, userId: req.user.id },
   });
   res.json(store);
 });
 
 // Endpoint to create a new product
-app.post("/products", async (req: Request, res: Response) => {
+app.post("/products",  [authenticateToken], async (req: Request, res: Response) => {
+  if (!req.user) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
   const { name, type, meta, storeId, location, price, quantity, unit } =
     req.body;
   try {
@@ -86,14 +103,12 @@ app.post("/products", async (req: Request, res: Response) => {
   }
 });
 
-// Endpoint to fetch all products
-app.get("/products", async (req: Request, res: Response) => {
-  const products = await prisma.product.findMany();
-  res.json(products);
-});
-
 // Endpoint to update a product
-app.patch("/products/:id", async (req: Request, res: Response) => {
+app.patch("/products/:id",   [authenticateToken],async (req: Request, res: Response) => {
+  if (!req.user) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
   const { id } = req.params;
   const { name, type, meta, storeId, location, price, quantity, unit } =
     req.body;
@@ -105,7 +120,11 @@ app.patch("/products/:id", async (req: Request, res: Response) => {
 });
 
 // Endpoint to delete a product by id
-app.delete("/products/:id", async (req: Request, res: Response) => {
+app.delete("/products/:id",   [authenticateToken],async (req: Request, res: Response) => {
+  if (!req.user) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
   const { id } = req.params;
   const product = await prisma.product.delete({
     where: { id },
@@ -119,3 +138,5 @@ const server = app.listen(port, () =>
 🚀 Server ready at: http://localhost:${port}
 ⭐️ See sample requests: http://pris.ly/e/ts/rest-express#3-using-the-rest-api`)
 );
+
+module.exports = server;
