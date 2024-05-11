@@ -1,7 +1,7 @@
 # custom-gpt-api-oauth
 
 ## Description 
-Example OpenAI Custom GPT with user authentication and the ability to read and write to a database.  
+Example OpenAI Custom GPT with empowered with user authentication and ability to read and write to a database.  
 
 Database: Prisma with Neon Serverless Postgres
 Authentication: Clerk oAuth 2 server.
@@ -25,3 +25,18 @@ What I am loving about Prisma is being able to generate the Types, restart my Ty
 ## Getting Started
 
 `pnpm install`
+
+## Generate Open API Specs
+
+Use the ActionsGPT created by OpenAI to create the Open API spec.
+https://chatgpt.com/g/g-TYEliDU6A-actionsgpt
+
+Here is the prompt:
+
+Create an Open API spec based on the code snippet below.  OAuth2 is used for authentication.  The scopes are “profile”, "email".  The spec should be in YAML format.
+
+```typescript
+{YOUR CODE HERE}
+```
+
+After it generates the spec, update the server URL, authorizationUrl, and tokenURL.

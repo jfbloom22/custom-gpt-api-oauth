@@ -1,0 +1,224 @@
+openapi: 3.0.0
+info:
+  title: Store and Product Management API
+  description: API for managing stores and their products.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Development server
+paths:
+  /stores:
+    get:
+      operationId: getStores
+      summary: Fetch all stores
+      responses:
+        '200':
+          description: An array of stores
+          content:
+            application/json:
+              schema: 
+                type: array
+                items: 
+                  $ref: '#/components/schemas/Store'
+    post:
+      operationId: createStore
+      summary: Create a new store
+      security:
+        - oauth2: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreRequest'
+      responses:
+        '200':
+          description: Returns the created store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Store'
+        '400':
+          description: Failed to create store
+        '401':
+          description: Unauthorized
+  /stores/{id}:
+    get:
+      operationId: getStoreById
+      summary: Fetch a store by ID including its products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A store and its products
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoreWithProducts'
+    delete:
+      operationId: deleteStore
+      summary: Delete a store by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Returns the deleted store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Store'
+  /products:
+    get:
+      operationId: getProducts
+      summary: Fetch all products
+      responses:
+        '200':
+          description: An array of products
+          content:
+            application/json:
+              schema: 
+                type: array
+                items: 
+                  $ref: '#/components/schemas/Product'
+    post:
+      operationId: createProduct
+      summary: Create a new product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+      responses:
+        '200':
+          description: Returns the created product
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: Failed to create product
+  /products/{id}:
+    patch:
+      operationId: updateProduct
+      summary: Update a product by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+      responses:
+        '200':
+          description: Returns the updated product
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+    delete:
+      operationId: deleteProduct
+      summary: Delete a product by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Returns the deleted product
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+components:
+  schemas:
+    Store:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        userId:
+          type: string
+    StoreRequest:
+      type: object
+      properties:
+        name:
+          type: string
+    StoreWithProducts:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+        meta:
+          type: object
+        location:
+          type: string
+        price:
+          type: number
+        quantity:
+          type: integer
+        unit:
+          type: string
+        storeId:
+          type: string
+    ProductRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        meta:
+          type: object
+        location:
+          type: string
+        price:
+          type: number
+        quantity:
+          type: integer
+        unit:
+          type: string
+        storeId:
+          type: string
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://clerk.simplejoysolutions.com/oauth/authorize
+          tokenUrl: https://clerk.simplejoysolutions.com/oauth/token
+          scopes:
+            profile: Access to profile
+            email: Access to email
