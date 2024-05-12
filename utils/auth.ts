@@ -1,6 +1,6 @@
 import { User } from '@prisma/client';
-import { ClerkUser } from './types/types';
-import { prisma } from './utils/db';
+import { ClerkUser } from '../../types/types';
+import { prisma } from './db';
 import NodeCache from 'node-cache'
 import { NextFunction, Request as ExpressRequest, Response } from 'express';
 
@@ -17,7 +17,8 @@ const tokenCache = new NodeCache({ stdTTL: 3600 })
 export const authenticateToken = async (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    throw new Error("Authorization header missing or invalid");
+    next();
+    return;
   }
 
   const bearerToken = authHeader.split(' ')[1];

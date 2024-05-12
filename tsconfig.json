@@ -5,8 +5,8 @@
       "strict": true,
       "lib": ["esnext"],
       "esModuleInterop": true,
-      "typeRoots": ["node_modules/@types", "src/@types"]
+      "typeRoots": ["node_modules/@types", "api/@types"]
     },
-    "include": ["src"]
+    "include": ["api", "types", "utils"]
   }
 
