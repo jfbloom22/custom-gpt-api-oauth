@@ -40,3 +40,13 @@ Create an Open API spec based on the code snippet below.  OAuth2 is used for aut
 ```
 
 After it generates the spec, update the server URL, authorizationUrl, and tokenURL.
+
+
+## Deploy to Vercel
+The project is setup to deploy to Vercel without any changes.  
+Note, Vercel automatically turns everything in the /api folder into serverless functions
+
+## Deploy as a conventional Nodejs server
+add a build script to package.json (`"build": "tsc"`).  Then you can use the dist folder as the root folder for your server.  
+
+

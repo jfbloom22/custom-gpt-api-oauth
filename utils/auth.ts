@@ -1,5 +1,5 @@
 import { User } from '@prisma/client';
-import { ClerkUser } from '../../types/types';
+import { ClerkUser } from '../types/types';
 import { prisma } from './db';
 import NodeCache from 'node-cache'
 import { NextFunction, Request as ExpressRequest, Response } from 'express';
