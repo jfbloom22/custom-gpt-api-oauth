@@ -50,7 +50,7 @@ app.get("/stores", [authenticateToken], async (req: Request, res: Response) => {
   res.json(stores);
 });
 
-// Endpoint to fetch a store by id and all it's products
+// Endpoint to fetch a store by id and all it's inventory and sales
 app.get(
   "/stores/:id",
   [authenticateToken],
@@ -63,9 +63,12 @@ app.get(
     const store = await prisma.store.findUnique({
       where: { id, userId: req.user.id },
       include: { 
-        products: { 
-          include: { sales: true } 
-        } 
+        inventory: { 
+          include: { product: true } 
+        },
+        sales: {
+          include: { product: true }
+        }
       },
     });
     res.json(store);
@@ -117,7 +120,7 @@ app.post(
       res.status(401).json({ error: "Unauthorized" });
       return;
     }
-    const { name, type, meta, storeId, location, price, quantity, unit } =
+    const { name, type, meta, price, unit } =
       req.body;
     try {
       const product = await prisma.product.create({
@@ -125,10 +128,7 @@ app.post(
           name,
           type,
           meta,
-          location,
           price,
-          storeId,
-          quantity,
           unit,
         },
       });
@@ -149,11 +149,11 @@ app.patch(
       return;
     }
     const { id } = req.params;
-    const { name, type, meta, storeId, location, price, quantity, unit } =
+    const { name, type, meta, price, unit } =
       req.body;
     const product = await prisma.product.update({
       where: { id },
-      data: { name, type, meta, storeId, location, price, quantity, unit },
+      data: { name, type, meta, price, unit },
     });
     res.json(product);
   }
@@ -178,12 +178,14 @@ app.delete(
 
 // Endpoint to create a new sale
 app.post("/sales", [authenticateToken], async (req: Request, res: Response) => {
-  const { productId, quantity, totalPrice } = req.body;
+  const { productId, quantitySold, storeId, totalPrice } = req.body;
   const sale = await prisma.sale.create({
     data: { 
-      productId, 
-      quantity,
+      productId,
+      storeId,
+      quantitySold,
       totalPrice,
+      store: { connect: { id: storeId } },
       product: { connect: { id: productId } } // Assuming product id is provided
     },
   });
@@ -193,10 +195,10 @@ app.post("/sales", [authenticateToken], async (req: Request, res: Response) => {
 // Endpoint to update a new sale
 app.patch("/sales/:id", [authenticateToken], async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { quantity, totalPrice } = req.body;
+  const { quantitySold, totalPrice, storeId, productId } = req.body;
   const sale = await prisma.sale.update({
     where: { id },
-    data: { quantity, totalPrice },
+    data: { quantitySold, totalPrice, storeId, productId },
   });
   res.json(sale);
 });
