@@ -60,9 +60,9 @@ app.get("/stores", [authenticateToken], async (req: Request, res: Response) => {
 });
 
 /**
- * Endpoint to fetch a store by id and all it's inventory and sales
+ * Endpoint to fetch a store by id and all it's inventory and products
  * @param {string} id - The id of the store
- * @returns {Store} - The store with it's inventory and sales
+ * @returns {Store} - The store with it's inventory and products
  */
 app.get(
   "/stores/:id",
@@ -78,9 +78,6 @@ app.get(
       include: { 
         inventory: { 
           include: { product: true } 
-        },
-        sales: {
-          include: { product: true }
         }
       },
     });
@@ -232,9 +229,7 @@ app.post("/sales", [authenticateToken], async (req: Request, res: Response) => {
       productId,
       storeId,
       quantitySold,
-      totalPrice,
-      store: { connect: { id: storeId } },
-      product: { connect: { id: productId } } // Assuming product id is provided
+      totalPrice
     },
   });
   res.json(sale);

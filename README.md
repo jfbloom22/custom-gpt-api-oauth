@@ -33,8 +33,12 @@ https://chatgpt.com/g/g-TYEliDU6A-actionsgpt
 
 Here is the prompt:
 
-Create an Open API spec based on the code snippet below.  OAuth2 is used for authentication.  The scopes are “profile”, "email".  The spec should be in YAML format.
-
+Create an Open API spec based on the Prisma Schema and code snippet below.  OAuth2 is used for authentication.  The scopes are “profile”, "email".  The spec should be in YAML format.
+Prisma schema:
+```
+{YOUR PRISMA SCHEMA HERE}
+```
+code snippet:
 ```typescript
 {YOUR CODE HERE}
 ```
@@ -53,4 +57,60 @@ add a build script to package.json (`"build": "tsc"`).  Then you can use the dis
 ## Known issues
 * `vercel dev` will not work as expected.  You will need to run `pnpm dev`.  For some reason it tries to call app.listen() a second time despite the fact that it does not do this in production.
 * when deploying to vercel, there are type build errors related to Prisma.  They are ignorable.  
+
+## Next Steps for Turning this into a real API
+* Add more endpoints
+* Add more tests
+* Add more error handling
+* Organize the API endpoints into files and folders
+    * Guide on a more Vercel friendly way to organize the API endpoints into files and folders
+        * https://www.prisma.io/blog/how-to-build-a-node-js-api-with-prisma-2-and-postgres-part-1-setting-up-the-development-environment-and-creating-the-database-schema   
+    * Guide on a more standard Express structure
+        src/
+        │
+        ├── controllers/       # Functions to handle requests
+        │   ├── storeController.ts
+        │   ├── productController.ts
+        │   └── userController.ts
+        ├── routes/            # Route definitions
+        │   ├── storeRoutes.ts
+        │   ├── productRoutes.ts
+        │   └── userRoutes.ts
+        │
+        └── api/
+            └── index.ts  
+* Automatically generate Open API specs
+    * consider using TSOA: https://tsoa-community.github.io/docs/getting-started.html
+
+
+
+## Clerk
+* Setup a new clerk project
+* Assign a custom production domain
+* Create a clerk Oauth2 Provider: https://clerk.com/docs/advanced-usage/clerk-idp#when-do-the-tokens-expire
+    * leave the callbackURL incorrect for now, we will update it later
+    * update the client secret and name
+```
+curl -X POST https://api.clerk.com/v1/oauth_applications \
+ -H "Authorization: Bearer <CLERK_SECRET_KEY>"  \
+ -H "Content-Type: application/json" \
+ -d '{"callback_url":"https://oauth-client.com/oauth2/callback", "name": "oauth_app_1", "scopes": "profile email"}'
+```
+* Take the response from clerk and use it to update the authentication in the custom GPT Action
+* Take the Open API schema generated above, update the server addrss, and authentication endpoints, then paste it into the schema for the Action
+* wait for the draft to save successfully
+* refresh and you should now see the Callback URL
+* Copy the Callback URL and update the Clerk Oauth2 server
+```
+curl -X PATCH https://api.clerk.com/v1/oauth_applications/<oauth_application_id> \
+ -H "Authorization: Bearer <CLERK_SECRET_KEY>"  \
+ -H "Content-Type: application/json" \
+ -d '{"callback_url":"https://oauth-client.com/oauth2/callback"}'
+```
+
+Verify with:
+```
+curl -X GET https://api.clerk.com/v1/oauth_applications \
+ -H "Authorization: Bearer <CLERK_SECRET_KEY>"
+```
 

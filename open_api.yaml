@@ -1,51 +1,58 @@
 openapi: 3.0.0
 info:
-  title: Store and Product Management API
-  description: API for managing stores and their products.
+  title: Store Management API
+  description: API for managing stores, products, sales, and inventory.
   version: 1.0.0
 servers:
   - url: http://localhost:3000
     description: Development server
+security:
+  - oauth2:
+      - profile
+      - email
 paths:
   /stores:
     get:
       operationId: getStores
-      summary: Fetch all stores
+      summary: Fetches all stores belonging to the user
+      security:
+        - oauth2: [profile, email]
       responses:
         '200':
           description: An array of stores
           content:
             application/json:
-              schema: 
+              schema:
                 type: array
-                items: 
+                items:
                   $ref: '#/components/schemas/Store'
     post:
       operationId: createStore
-      summary: Create a new store
-      security:
-        - oauth2: []
+      summary: Creates a new store
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/StoreRequest'
+              type: object
+              properties:
+                name:
+                  type: string
+                address:
+                  type: string
       responses:
         '200':
-          description: Returns the created store
+          description: The newly created store
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Store'
-        '400':
-          description: Failed to create store
-        '401':
-          description: Unauthorized
   /stores/{id}:
     get:
       operationId: getStoreById
-      summary: Fetch a store by ID including its products
+      summary: Fetches a store by ID along with its inventory and products
+      security:
+        - oauth2: [profile, email]
       parameters:
         - name: id
           in: path
@@ -54,14 +61,45 @@ paths:
             type: string
       responses:
         '200':
-          description: A store and its products
+          description: A single store with inventory and products
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StoreWithProducts'
+                $ref: '#/components/schemas/Store'
+    patch:
+      operationId: updateStore
+      summary: Updates a store
+      security:
+        - oauth2: [profile, email]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                address:
+                  type: string
+      responses:
+        '200':
+          description: The updated store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Store'
     delete:
       operationId: deleteStore
-      summary: Delete a store by ID
+      summary: Deletes a store by ID
+      security:
+        - oauth2: [profile, email]
       parameters:
         - name: id
           in: path
@@ -70,46 +108,45 @@ paths:
             type: string
       responses:
         '200':
-          description: Returns the deleted store
+          description: The store that was deleted
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Store'
   /products:
-    get:
-      operationId: getProducts
-      summary: Fetch all products
-      responses:
-        '200':
-          description: An array of products
-          content:
-            application/json:
-              schema: 
-                type: array
-                items: 
-                  $ref: '#/components/schemas/Product'
     post:
       operationId: createProduct
-      summary: Create a new product
+      summary: Creates a new product
+      security:
+        - oauth2: [profile, email]
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ProductRequest'
+              type: object
+              properties:
+                name:
+                  type: string
+                type:
+                  type: string
+                meta:
+                  type: object
+                price:
+                  type: number
       responses:
         '200':
-          description: Returns the created product
+          description: The newly created product
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Product'
-        '400':
-          description: Failed to create product
   /products/{id}:
     patch:
       operationId: updateProduct
-      summary: Update a product by ID
+      summary: Updates a product by ID
+      security:
+        - oauth2: [profile, email]
       parameters:
         - name: id
           in: path
@@ -121,17 +158,28 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ProductRequest'
+              type: object
+              properties:
+                name:
+                  type: string
+                type:
+                  type: string
+                meta:
+                  type: object
+                price:
+                  type: number
       responses:
         '200':
-          description: Returns the updated product
+          description: The updated product
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Product'
     delete:
       operationId: deleteProduct
-      summary: Delete a product by ID
+      summary: Deletes a product by ID
+      security:
+        - oauth2: [profile, email]
       parameters:
         - name: id
           in: path
@@ -140,12 +188,205 @@ paths:
             type: string
       responses:
         '200':
-          description: Returns the deleted product
+          description: The product that was deleted
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Product'
+  /sales:
+    post:
+      operationId: createSale
+      summary: Creates a new sale
+      security:
+        - oauth2: [profile, email]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                productId:
+                  type: string
+                quantitySold:
+                  type: integer
+                storeId:
+                  type: string
+                totalPrice:
+                  type: number
+      responses:
+        '200':
+          description: The newly created sale
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sale'
+    get:
+      operationId: getSales
+      summary: Fetches sales, optional filters for within a date range and specific stores
+      security:
+        - oauth2: [profile, email]
+      parameters:
+        - name: storeId
+          in: query
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: An array of sales
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Sale'
+  /sales/{id}:
+    patch:
+      operationId: updateSale
+      summary: Updates a sale by ID
+      security:
+        - oauth2: [profile, email]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quantitySold:
+                  type: integer
+                totalPrice:
+                  type: number
+                storeId:
+                  type: string
+                productId:
+                  type: string
+      responses:
+        '200':
+          description: The sale that was updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sale'
+    delete:
+      operationId: deleteSale
+      summary: Deletes a sale by ID
+      security:
+        - oauth2: [profile, email]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The sale that was deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sale'
+  /inventory:
+    post:
+      operationId: createInventory
+      summary: Creates a new inventory entry
+      security:
+        - oauth2: [profile, email]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                productId:
+                  type: string
+                storeId:
+                  type: string
+                quantity:
+                  type: integer
+      responses:
+        '200':
+          description: The newly created inventory
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inventory'
+  /inventory/{id}:
+    patch:
+      operationId: updateInventory
+      summary: Updates an inventory entry by ID
+      security:
+        - oauth2: [profile, email]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                productId:
+                  type: string
+                storeId:
+                  type: string
+                quantity:
+                  type: integer
+      responses:
+        '200':
+          description: The inventory that was updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inventory'
+    delete:
+      operationId: deleteInventory
+      summary: Deletes an inventory entry by ID
+      security:
+        - oauth2: [profile, email]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The inventory that was deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inventory'
 components:
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://example.com/oauth/authorize
+          tokenUrl: https://example.com/oauth/token
+          scopes:
+            profile: Access to your profile information
+            email: Access to your email address
   schemas:
     Store:
       type: object
@@ -154,24 +395,12 @@ components:
           type: string
         name:
           type: string
-        userId:
+        address:
           type: string
-    StoreRequest:
-      type: object
-      properties:
-        name:
+        createdAt:
           type: string
-    StoreWithProducts:
-      type: object
-      properties:
-        id:
+        updatedAt:
           type: string
-        name:
-          type: string
-        products:
-          type: array
-          items:
-            $ref: '#/components/schemas/Product'
     Product:
       type: object
       properties:
@@ -183,42 +412,41 @@ components:
           type: string
         meta:
           type: object
-        location:
-          type: string
         price:
           type: number
-        quantity:
-          type: integer
-        unit:
+        createdAt:
           type: string
-        storeId:
+        updatedAt:
           type: string
-    ProductRequest:
+    Sale:
       type: object
       properties:
-        name:
+        id:
           type: string
-        type:
-          type: string
-        meta:
-          type: object
-        location:
-          type: string
-        price:
-          type: number
-        quantity:
-          type: integer
-        unit:
+        productId:
           type: string
         storeId:
           type: string
-  securitySchemes:
-    oauth2:
-      type: oauth2
-      flows:
-        authorizationCode:
-          authorizationUrl: https://clerk.simplejoysolutions.com/oauth/authorize
-          tokenUrl: https://clerk.simplejoysolutions.com/oauth/token
-          scopes:
-            profile: Access to profile
-            email: Access to email
+        quantitySold:
+          type: integer
+        totalPrice:
+          type: number
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    Inventory:
+      type: object
+      properties:
+        id:
+          type: string
+        productId:
+          type: string
+        storeId:
+          type: string
+        quantity:
+          type: integer
+        createdAt:
+          type: string
+        updatedAt:
+          type: string

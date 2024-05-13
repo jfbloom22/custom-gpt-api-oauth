@@ -41,6 +41,8 @@ async function fetchClerkUser(bearerToken: string): Promise<ClerkUser> {
   });
 
   if (!response.ok) {
+    console.error(response)
+    console.log('bearer', bearerToken)
     throw new Error("Authentication failed with status: " + response.status);
   }
 
