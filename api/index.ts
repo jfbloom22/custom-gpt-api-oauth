@@ -168,7 +168,15 @@ app.post(
   }
 );
 
-// Endpoint to update a product
+/**
+ * Endpoint to update a product
+ * @param {string} id - The id of the product
+ * @param {string} name - The name of the product
+ * @param {string} type - The type of the product
+ * @param {string} meta - Any additional metadata about the product
+ * @param {number} price - The price of the product
+ * @returns {Product} - The product that was updated
+ */
 app.patch(
   "/products/:id",
   [authenticateToken],
@@ -188,7 +196,11 @@ app.patch(
   }
 );
 
-// Endpoint to delete a product by id
+/**
+ * Endpoint to delete a product by id
+ * @param {string} id - The id of the product
+ * @returns {Product} - The product that was deleted
+ */
 app.delete(
   "/products/:id",
   [authenticateToken],
@@ -205,7 +217,14 @@ app.delete(
   }
 );
 
-// Endpoint to create a new sale
+/**
+ * Endpoint to create a new sale
+ * @param {string} productId - The id of the product
+ * @param {number} quantitySold - The quantity sold
+ * @param {string} storeId - The id of the store
+ * @param {number} totalPrice - The total price of the sale
+ * @returns {Sale} - The newly created sale
+ */
 app.post("/sales", [authenticateToken], async (req: Request, res: Response) => {
   const { productId, quantitySold, storeId, totalPrice } = req.body;
   const sale = await prisma.sale.create({
@@ -221,7 +240,14 @@ app.post("/sales", [authenticateToken], async (req: Request, res: Response) => {
   res.json(sale);
 });
 
-// Endpoint to update a new sale
+/**
+ * Endpoint to update a sale
+ * @param {string} id - The id of the sale
+ * @param {number} quantitySold - The quantity sold
+ * @param {string} storeId - The id of the store
+ * @param {number} totalPrice - The total price of the sale
+ * @returns {Sale} - The sale that was updated
+ */
 app.patch("/sales/:id", [authenticateToken], async (req: Request, res: Response) => {
   const { id } = req.params;
   const { quantitySold, totalPrice, storeId, productId } = req.body;
@@ -232,7 +258,11 @@ app.patch("/sales/:id", [authenticateToken], async (req: Request, res: Response)
   res.json(sale);
 });
 
-// Endpoint to delete a sale by id
+/**
+ * Endpoint to delete a sale by id
+ * @param {string} id - The id of the sale
+ * @returns {Sale} - The sale that was deleted
+ */
 app.delete("/sales/:id", [authenticateToken], async (req: Request, res: Response) => {
   const { id } = req.params;
   const sale = await prisma.sale.delete({
@@ -243,15 +273,10 @@ app.delete("/sales/:id", [authenticateToken], async (req: Request, res: Response
 
 const port = process.env.PORT || 3000;
 
-// Vercel calls app.listen(), so in order to avoid calling it twice, check if we are running in production
-// In Vercel, we don’t need to call the listen() of express to listen for incoming requests, everything will be internally run by Vercel
-// ref: https://www.geeksforgeeks.org/how-to-deploy-an-express-application-to-vercel/
-// if (process.env.NODE_ENV !== "production") {
   app.listen(port, () => {
     console.log(`
       🚀 Server ready at: http://localhost:${port}
       ⭐️ See sample requests: http://pris.ly/e/ts/rest-express#3-using-the-rest-api`);
   });
-// }
 
 module.exports = app;
