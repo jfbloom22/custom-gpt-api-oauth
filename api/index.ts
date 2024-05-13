@@ -13,7 +13,12 @@ interface Request extends ExpressRequest {
 app.use(express.json());
 app.use(morgan("dev"));
 
-// Endpoint to create a new store
+/**
+ * Endpoint to create a new store
+ * @param {string} name - The name of the store
+ * @param {string} address - The address of the store
+ * @returns {Store} - The newly created store
+ */
 app.post(
   "/stores",
   [authenticateToken],
@@ -39,7 +44,11 @@ app.post(
   }
 );
 
-// Endpoint to fetch all stores beloging to the user
+/**
+ * Endpoint to fetch all stores beloging to the user
+ * @param {string} userId - The id of the user
+ * @returns {Store[]} - The stores beloging to the user
+ */
 app.get("/stores", [authenticateToken], async (req: Request, res: Response) => {
   if (!req.user) {
     res.status(401).json({ error: "Unauthorized" });
@@ -50,7 +59,11 @@ app.get("/stores", [authenticateToken], async (req: Request, res: Response) => {
   res.json(stores);
 });
 
-// Endpoint to fetch a store by id and all it's inventory and sales
+/**
+ * Endpoint to fetch a store by id and all it's inventory and sales
+ * @param {string} id - The id of the store
+ * @returns {Store} - The store with it's inventory and sales
+ */
 app.get(
   "/stores/:id",
   [authenticateToken],
@@ -75,7 +88,11 @@ app.get(
   }
 );
 
-// Endpoint to delete a store by id
+/**
+ * Endpoint to delete a store by id
+ * @param {string} id - The id of the store
+ * @returns {Store} - The store that was deleted
+ */
 app.delete(
   "/stores/:id",
   [authenticateToken],
@@ -92,7 +109,13 @@ app.delete(
   }
 );
 
-// Endpoint to update a store
+/**
+ * Endpoint to update a store
+ * @param {string} id - The id of the store
+ * @param {string} name - The name of the store
+ * @param {string} address - The address of the store
+ * @returns {Store} - The store that was updated
+ */
 app.patch(
   "/stores/:id",
   [authenticateToken],
@@ -111,7 +134,14 @@ app.patch(
   }
 );
 
-// Endpoint to create a new product
+/**
+ * Endpoint to create a new product
+ * @param {string} name - The name of the product
+ * @param {string} type - The type of the product
+ * @param {string} meta - Any additional metadata about the product
+ * @param {number} price - The price of the product
+ * @returns {Product} - The newly created product
+ */
 app.post(
   "/products",
   [authenticateToken],
@@ -120,7 +150,7 @@ app.post(
       res.status(401).json({ error: "Unauthorized" });
       return;
     }
-    const { name, type, meta, price, unit } =
+    const { name, type, meta, price } =
       req.body;
     try {
       const product = await prisma.product.create({
@@ -129,7 +159,6 @@ app.post(
           type,
           meta,
           price,
-          unit,
         },
       });
       res.json(product);
@@ -149,11 +178,11 @@ app.patch(
       return;
     }
     const { id } = req.params;
-    const { name, type, meta, price, unit } =
+    const { name, type, meta, price } =
       req.body;
     const product = await prisma.product.update({
       where: { id },
-      data: { name, type, meta, price, unit },
+      data: { name, type, meta, price },
     });
     res.json(product);
   }

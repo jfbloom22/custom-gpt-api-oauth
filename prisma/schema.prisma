@@ -36,7 +36,6 @@ model Product {
   name      String
   type      String
   meta      Json?
-  unit      String?
   price     Float       @default(0)
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt

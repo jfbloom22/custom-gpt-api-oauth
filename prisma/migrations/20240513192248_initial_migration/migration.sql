@@ -28,7 +28,6 @@ CREATE TABLE "Product" (
     "name" TEXT NOT NULL,
     "type" TEXT NOT NULL,
     "meta" JSONB,
-    "unit" TEXT,
     "price" DOUBLE PRECISION NOT NULL DEFAULT 0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
