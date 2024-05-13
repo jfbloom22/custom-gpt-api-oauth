@@ -18,7 +18,7 @@ app.post(
   "/stores",
   [authenticateToken],
   async (req: Request, res: Response) => {
-    const { name } = req.body;
+    const { name, address } = req.body;
     if (!req.user) {
       res.status(401).json({ error: "Unauthorized" });
       return;
@@ -29,6 +29,7 @@ app.post(
         data: {
           name,
           userId,
+          address
         },
       });
       res.json(store);
@@ -83,6 +84,25 @@ app.delete(
     const { id } = req.params;
     const store = await prisma.store.delete({
       where: { id, userId: req.user.id },
+    });
+    res.json(store);
+  }
+);
+
+// Endpoint to update a store
+app.patch(
+  "/stores/:id",
+  [authenticateToken],
+  async (req: Request, res: Response) => {
+    if (!req.user) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+    const { id } = req.params;
+    const { name, address } = req.body;
+    const store = await prisma.store.update({
+      where: { id, userId: req.user.id },
+      data: { name, address },
     });
     res.json(store);
   }
@@ -155,6 +175,40 @@ app.delete(
     res.json(product);
   }
 );
+
+// Endpoint to create a new sale
+app.post("/sales", [authenticateToken], async (req: Request, res: Response) => {
+  const { productId, quantity, totalPrice } = req.body;
+  const sale = await prisma.sale.create({
+    data: { 
+      productId, 
+      quantity,
+      totalPrice,
+      product: { connect: { id: productId } } // Assuming product id is provided
+    },
+  });
+  res.json(sale);
+});
+
+// Endpoint to update a new sale
+app.patch("/sales/:id", [authenticateToken], async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { quantity, totalPrice } = req.body;
+  const sale = await prisma.sale.update({
+    where: { id },
+    data: { quantity, totalPrice },
+  });
+  res.json(sale);
+});
+
+// Endpoint to delete a sale by id
+app.delete("/sales/:id", [authenticateToken], async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const sale = await prisma.sale.delete({
+    where: { id },
+  });
+  res.json(sale);
+});
 
 const port = process.env.PORT || 3000;
 
