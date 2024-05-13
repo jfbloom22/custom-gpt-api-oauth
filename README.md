@@ -50,3 +50,7 @@ Note, Vercel automatically turns everything in the /api folder into serverless f
 add a build script to package.json (`"build": "tsc"`).  Then you can use the dist folder as the root folder for your server.  
 
 
+## Known issues
+* `vercel dev` will not work as expected.  You will need to run `pnpm dev`.  For some reason it tries to call app.listen() a second time despite the fact that it does not do this in production.
+* when deploying to vercel, there are type build errors related to Prisma.  They are ignorable.  
+

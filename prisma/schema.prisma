@@ -1,7 +1,7 @@
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["driverAdapters"]
-  binaryTargets = ["native", "debian-openssl-1.0.x"]
+  binaryTargets   = ["native", "debian-openssl-1.0.x"]
 }
 
 datasource db {
@@ -22,6 +22,7 @@ model User {
 model Store {
   id        String    @id @default(uuid())
   name      String
+  address   String?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   userId    String
@@ -42,4 +43,14 @@ model Product {
   store     Store    @relation(fields: [storeId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  sales      Sale[]
+}
+
+model Sale {
+  id         String   @id @default(uuid())
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id])
+  quantity   Int
+  totalPrice Float
+  createdAt  DateTime @default(now())
 }

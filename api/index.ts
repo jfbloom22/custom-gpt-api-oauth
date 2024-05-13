@@ -61,7 +61,11 @@ app.get(
     const { id } = req.params;
     const store = await prisma.store.findUnique({
       where: { id, userId: req.user.id },
-      include: { products: true },
+      include: { 
+        products: { 
+          include: { sales: true } 
+        } 
+      },
     });
     res.json(store);
   }
