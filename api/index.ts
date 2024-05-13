@@ -271,6 +271,71 @@ app.delete("/sales/:id", [authenticateToken], async (req: Request, res: Response
   res.json(sale);
 });
 
+/**
+ * Endpoint to fetch sales. optional filters for within a date range and for specific stores
+ * @param {string} storeId - The id of the store
+ * @param {string} startDate - The start date of the date range
+ * @param {string} endDate - The end date of the date range
+ * @returns {Sale[]} - The sales within the date range and for the store or stores
+ */
+app.get("/sales", [authenticateToken], async (req: Request, res: Response) => {
+  const { storeId, startDate, endDate } = req.query;
+  const where: { storeId?: string, createdAt?: { gte: string, lte: string } } = {};
+  if (storeId && typeof storeId === 'string') where.storeId = storeId;
+  if (startDate && endDate && typeof startDate === 'string' && typeof endDate === 'string') where.createdAt = { gte: startDate, lte: endDate };
+  const sales = await prisma.sale.findMany({ where });
+  res.json(sales);
+});
+
+/**
+ * Endpoint to create a new inventory
+ * @param {string} productId - The id of the product
+ * @param {string} storeId - The id of the store
+ * @param {number} quantity - The quantity of the product
+ * @returns {Inventory} - The newly created inventory
+ */
+app.post("/inventory", [authenticateToken], async (req: Request, res: Response) => {
+  const { productId, storeId, quantity } = req.body;
+  const inventory = await prisma.inventory.create({
+    data: { productId, storeId, quantity },
+  });
+  res.json(inventory);
+});
+
+/**
+ * Endpoint to update an inventory
+ * @param {string} id - The id of the inventory
+ * @param {string} productId - The id of the product
+ * @param {string} storeId - The id of the store
+ * @param {number} quantity - The quantity of the product
+ * @returns {Inventory} - The inventory that was updated
+ */
+app.patch("/inventory/:id", [authenticateToken], async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { productId, storeId, quantity } = req.body;
+  const inventory = await prisma.inventory.update({
+    where: { id },
+    data: { productId, storeId, quantity },
+  });
+  res.json(inventory);
+});
+
+/**
+ * Endpoint to delete an inventory by id
+ * @param {string} id - The id of the inventory
+ * @returns {Inventory} - The inventory that was deleted
+ */
+app.delete("/inventory/:id", [authenticateToken], async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const inventory = await prisma.inventory.delete({
+    where: { id },
+  });
+  res.json(inventory);
+});
+
+
+
+
 const port = process.env.PORT || 3000;
 
   app.listen(port, () => {
