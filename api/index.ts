@@ -278,9 +278,13 @@ app.get("/sales", [authenticateToken], async (req: Request, res: Response) => {
   const where: { storeId?: string, createdAt?: { gte: string, lte: string } } = {};
   if (storeId && typeof storeId === 'string') where.storeId = storeId;
   if (startDate && endDate && typeof startDate === 'string' && typeof endDate === 'string') {
+    let endDateTime = new Date(endDate);
+    if (!endDate.includes('T')) {
+      endDateTime.setHours(23, 59, 59, 999);
+    }
     where.createdAt = { 
       gte: new Date(startDate).toISOString(), 
-      lte: new Date(endDate).toISOString() 
+      lte: endDateTime.toISOString() 
     };
   }
   const sales = await prisma.sale.findMany({ where });
