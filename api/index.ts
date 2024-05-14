@@ -277,7 +277,12 @@ app.get("/sales", [authenticateToken], async (req: Request, res: Response) => {
   const { storeId, startDate, endDate } = req.query;
   const where: { storeId?: string, createdAt?: { gte: string, lte: string } } = {};
   if (storeId && typeof storeId === 'string') where.storeId = storeId;
-  if (startDate && endDate && typeof startDate === 'string' && typeof endDate === 'string') where.createdAt = { gte: startDate, lte: endDate };
+  if (startDate && endDate && typeof startDate === 'string' && typeof endDate === 'string') {
+    where.createdAt = { 
+      gte: new Date(startDate).toISOString(), 
+      lte: new Date(endDate).toISOString() 
+    };
+  }
   const sales = await prisma.sale.findMany({ where });
   res.json(sales);
 });
