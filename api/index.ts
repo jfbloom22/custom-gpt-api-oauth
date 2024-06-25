@@ -275,8 +275,7 @@ app.delete("/sales/:id", [authenticateToken], async (req: Request, res: Response
  */
 app.get("/sales", [authenticateToken], async (req: Request, res: Response) => {
   const { storeId, startDate, endDate } = req.query;
-  const where: { storeId?: string, createdAt?: { gte: string, lte: string } } = {};
-  if (storeId && typeof storeId === 'string') where.storeId = storeId;
+  const where: { storeId: string, createdAt?: { gte: string, lte: string } } = { storeId: storeId as string };
   if (startDate && endDate && typeof startDate === 'string' && typeof endDate === 'string') {
     let endDateTime = new Date(endDate);
     if (!endDate.includes('T')) {

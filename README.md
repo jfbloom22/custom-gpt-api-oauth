@@ -1,12 +1,15 @@
 # custom-gpt-api-oauth
 
 ## Description 
-Example OpenAI Custom GPT with empowered with user authentication and ability to read and write to a database.  
+Example OpenAI Custom GPT with user authentication and ability to read and write from a database.  
 
 Database: Prisma with Neon Serverless Postgres
-Authentication: Clerk oAuth 2 server.
+Authentication: Clerk OAuth 2 server
 
-Additional features: automatically generate open API specs using swagger.  
+### Other goal: Inexpensive 
+Neon and Vercel have generous free tiers. 
+ChatGPT plus subscription is required for creating custom GPTs.
+Custom Domain Name.  I like to purchase domains from Hover.com because I don't mind paying a bit extra in order to have a simple interface and not be bombarded with ads.
 
 ## Prisma
 `npx prisma generate` - this will generate the Prisma client
@@ -53,10 +56,6 @@ Note, Vercel automatically turns everything in the /api folder into serverless f
 ## Deploy as a conventional Nodejs server
 add a build script to package.json (`"build": "tsc"`).  Then you can use the dist folder as the root folder for your server.  
 
-
-## Known issues
-* `vercel dev` will not work as expected.  You will need to run `pnpm dev`.  For some reason it tries to call app.listen() a second time despite the fact that it does not do this in production.
-* when deploying to vercel, there are type build errors related to Prisma.  They are ignorable.  
 
 ## Next Steps for Turning this into a real API
 * Add more endpoints
@@ -114,3 +113,13 @@ curl -X GET https://api.clerk.com/v1/oauth_applications \
  -H "Authorization: Bearer <CLERK_SECRET_KEY>"
 ```
 
+## ChatGPT Domain Verification
+In order to publish a GPT, you need to complete your Builder Profile including verifying your domain name.
+More info: https://help.openai.com/en/articles/8798878-building-and-publishing-a-gpt
+
+
+## FAQ
+* `vercel dev` is not working as expected.
+    run `pnpm dev`.  For some reason it tries to call app.listen() a second time despite the fact that it does not do this in production.
+* When deploying to vercel, there are type build errors related to Prisma.  
+    They are ignorable.  
