@@ -25,68 +25,18 @@ What I am loving about Prisma is being able to generate the Types, restart my Ty
 `npx prisma studio` - this will open the Prisma Studio in your browser.  You can use this to visually see the database schema and relationships.
 
 
-## Getting Started
-Below I will describe how to get the project up and running.  For more detailed instructions, refer to my blog post:
+# Getting Started
+Below I will describe how to get the project up and running.
 
-`pnpm install`
+## Create a Custom GPT
+* [Creating a GPT | OpenAI Help Center](https://help.openai.com/en/articles/8554397-creating-a-gpt)
 
-## Generate Open API Specs
+## Custom Domain Name
+* you will need a custom domain name when configuring Clerk.
 
-Use the ActionsGPT created by OpenAI to create the Open API spec.
-https://chatgpt.com/g/g-TYEliDU6A-actionsgpt
-
-Here is the prompt:
-
-Create an Open API spec based on the Prisma Schema and code snippet below.  OAuth2 is used for authentication.  The scopes are “profile”, "email".  The spec should be in YAML format.
-Prisma schema:
-```
-{YOUR PRISMA SCHEMA HERE}
-```
-code snippet:
-```typescript
-{YOUR CODE HERE}
-```
-
-After it generates the spec, update the server URL, authorizationUrl, and tokenURL.
-
-
-## Deploy to Vercel
-The project is setup to deploy to Vercel without any changes.  
-Note, Vercel automatically turns everything in the /api folder into serverless functions
-
-## Deploy as a conventional Nodejs server
-add a build script to package.json (`"build": "tsc"`).  Then you can use the dist folder as the root folder for your server.  
-
-
-## Next Steps for Turning this into a real API
-* Add more endpoints
-* Add more tests
-* Add more error handling
-* Organize the API endpoints into files and folders
-    * Guide on a more Vercel friendly way to organize the API endpoints into files and folders
-        * https://www.prisma.io/blog/how-to-build-a-node-js-api-with-prisma-2-and-postgres-part-1-setting-up-the-development-environment-and-creating-the-database-schema   
-    * Guide on a more standard Express structure
-        src/
-        │
-        ├── controllers/       # Functions to handle requests
-        │   ├── storeController.ts
-        │   ├── productController.ts
-        │   └── userController.ts
-        ├── routes/            # Route definitions
-        │   ├── storeRoutes.ts
-        │   ├── productRoutes.ts
-        │   └── userRoutes.ts
-        │
-        └── api/
-            └── index.ts  
-* Automatically generate Open API specs
-    * consider using TSOA: https://tsoa-community.github.io/docs/getting-started.html
-
-
-
-## Clerk
-* Setup a new clerk project
-* Assign a custom production domain
+## Setup Clerk
+* create a new clerk project
+* Create a production instance and [assign a custom production domain](https://clerk-docs-git-setup-clerk-doc.clerkpreview.com/migrations-deployments/production)
 * Create a [Clerk Oauth2 Provider](https://clerk.com/docs/advanced-usage/clerk-idp)
     * leave the callbackURL incorrect for now, we will update it later
     * update the client secret and name
@@ -114,6 +64,45 @@ curl -X GET https://api.clerk.com/v1/oauth_applications \
  -H "Authorization: Bearer <CLERK_SECRET_KEY>"
 ```
 
+## Setup Neon
+* create a new Neon database
+* create a new Prisma schema
+* update the `DATABASE_URL` in the `.env` file
+
+## Install Packages
+
+`pnpm install`
+
+## Run Database Migrations
+`npx prisma generate`
+`npx prisma db push`
+
+## Generate Open API Specs
+
+Use the ActionsGPT created by OpenAI to create the Open API spec.
+https://chatgpt.com/g/g-TYEliDU6A-actionsgpt
+
+Here is the prompt:
+
+Create an Open API spec based on the Prisma Schema and code snippet below.  OAuth2 is used for authentication.  The scopes are “profile”, "email".  The spec should be in YAML format.
+Prisma schema:
+```
+{YOUR PRISMA SCHEMA HERE}
+```
+code snippet:
+```typescript
+{YOUR CODE HERE}
+```
+
+After it generates the spec, update the server URL, authorizationUrl, and tokenURL.
+
+
+## Deploy to Vercel
+* The project is setup to deploy to Vercel without any changes.  
+* Note, Vercel automatically turns everything in the /api folder into serverless functions
+* I suggest using the [Vercel CLI](https://vercel.com/docs/deployments/overview#vercel-cli) to deploy the project
+
+
 # Publishing a GPT
 ## ChatGPT Domain Verification
 In order to publish a GPT, you need to complete your Builder Profile including verifying your domain name.
@@ -132,6 +121,35 @@ Ask me any questions you need to improve the privacy policy.
     run `pnpm dev`.  For some reason it tries to call app.listen() a second time despite the fact that it does not do this in production.
 * When deploying to vercel, there are type build errors related to Prisma.  
     They are ignorable.  
+* How do I deploy this to a conventional Nodejs server?
+    add a build script to package.json (`"build": "tsc"`).  Then you can use the dist folder as the root folder for your server.  
+
+
+
+# Next Steps for Production Deploy
+* This is a demo project.  It is not recommended to deploy to a production environment.  While building, I intentionally tried to keep things simple and avoid adding things like tests, error handling, and more.  I did not want to make this demo too complicated.  However, below are a few things I would recommend before a production deploy:
+    * Add tests
+    * Add error handling
+    * Add more endpoints
+    * Add more error handling
+    * Follow this Guide on a more Vercel friendly way to organize the API endpoints into files and folders
+        * https://www.prisma.io/blog/how-to-build-a-node-js-api-with-prisma-2-and-postgres-part-1-setting-up-the-development-environment-and-creating-the-database-schema   
+    * Alternative guide on a more standard Express structure
+        src/
+        │
+        ├── controllers/       # Functions to handle requests
+        │   ├── storeController.ts
+        │   ├── productController.ts
+        │   └── userController.ts
+        ├── routes/            # Route definitions
+        │   ├── storeRoutes.ts
+        │   ├── productRoutes.ts
+        │   └── userRoutes.ts
+        │
+        └── api/
+            └── index.ts  
+    * Automatically generate Open API specs
+    * consider using TSOA: https://tsoa-community.github.io/docs/getting-started.html
 
 ## Contributing
 
