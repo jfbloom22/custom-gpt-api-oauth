@@ -3,13 +3,12 @@
 ## Description 
 Example OpenAI Custom GPT with user authentication and ability to read and write from a database.  
 
-Database: [Prisma](https://prisma.io) with [Neon](https://neon.tech) Serverless Postgres (has free tier)
-Authentication: [Clerk.com](https://clerk.com) OAuth 2 server (has free tier)
-Hosting: [Vercel](https://vercel.com) (has free tier)
+* Database: [Prisma](https://prisma.io) with [Neon](https://neon.tech) Serverless Postgres
+* Authentication: [Clerk.com](https://clerk.com) OAuth 2 server
+* Hosting: [Vercel](https://vercel.com)
 
 
 # Getting Started
-Below I will describe how to get your GPT up and running.
 
 ## Create a Custom GPT
 * [Creating a GPT | OpenAI Help Center](https://help.openai.com/en/articles/8554397-creating-a-gpt)
@@ -49,7 +48,6 @@ curl -X GET https://api.clerk.com/v1/oauth_applications \
 
 ## Setup Neon
 * create a new Neon database
-* create a new Prisma schema
 * update the `DATABASE_URL` in the `.env` file
 
 ## Install Packages
@@ -85,18 +83,22 @@ After it generates the spec, update the server URL, authorizationUrl, and tokenU
 * Note, Vercel automatically turns everything in the /api folder into serverless functions
 * I suggest using the [Vercel CLI](https://vercel.com/docs/deployments/overview#vercel-cli) to deploy the project
 
+## Update and Test the GPT
+* update the Open API spec with the URL for your deployed API
+* test the GPT
+
+## Privacy Policy
+* Before publishing a GPT, you will need to create a privacy policy.  If you don't have one, here is a prompt template:
+
+Help me create a simple privacy policy to publish on my website for my custom GPT.  My company name is [company name] and my |website is [website url].  The company will collect email addresses, but it will never sell this information to third parties  Ask me any questions you need to improve the privacy policy.
+
 
 # Publishing a GPT
 ## ChatGPT Domain Verification
 In order to publish a GPT, you need to complete your Builder Profile including verifying your domain name.
 More info: https://help.openai.com/en/articles/8798878-building-and-publishing-a-gpt
 
-## Privacy Policy
-Before publishing a GPT, you will need to create a privacy policy.  If you don't have one, here is a prompt template:
-```
-Help me create a simple privacy policy to publish on my website for my custom GPT.  My company name is [company name] and my website is [website url].  The company will collect email addresses, but it will never sell this information to third parties.
-Ask me any questions you need to improve the privacy policy.
-```
+
 
 
 ## FAQ
@@ -114,7 +116,7 @@ Ask me any questions you need to improve the privacy policy.
 `prisma migrate deploy` - this will run the migrations
 
 
-What I am loving about Prisma is being able to generate the Types, restart my Typescript server, and boom, I have the types for free.  I can also use Prisma Studio to visually see the database schema and relationships.  It's a great tool for development.
+Note: What I am loving about Prisma is being able to generate the Types, restart my Typescript server, and boom, I have the types for free.  I can also use Prisma Studio to visually see the database schema and relationships.  It's a great tool for development.
 
 * How do I use Prisma Studio?
 `npx prisma studio` - this will open the Prisma Studio in your browser.  You can use this to visually see the database schema and relationships.
