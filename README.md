@@ -26,6 +26,7 @@ What I am loving about Prisma is being able to generate the Types, restart my Ty
 
 
 ## Getting Started
+Below I will describe how to get the project up and running.  For more detailed instructions, refer to my blog post:
 
 `pnpm install`
 
@@ -95,8 +96,7 @@ curl -X POST https://api.clerk.com/v1/oauth_applications \
  -H "Content-Type: application/json" \
  -d '{"callback_url":"https://oauth-client.com/oauth2/callback", "name": "oauth_app_1", "scopes": "profile email"}'
 ```
-* Take the response from clerk and use it to update the authentication in the custom GPT Action
-![Action Oauth2 Config](readme-images/action-auth.png)
+* The response from Clerk will have the information needed to configure authentication in the custom GPT Action
 * Take the Open API schema generated above, update the server addrss, and authentication endpoints, then paste it into the schema for the Action
 * wait for the draft to save successfully
 * refresh and you should now see the Callback URL
@@ -132,3 +132,11 @@ Ask me any questions you need to improve the privacy policy.
     run `pnpm dev`.  For some reason it tries to call app.listen() a second time despite the fact that it does not do this in production.
 * When deploying to vercel, there are type build errors related to Prisma.  
     They are ignorable.  
+
+## Contributing
+
+PRs are welcome.  Please feel free to submit a PR or an issue.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.txt](LICENSE.txt) file for details.
