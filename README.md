@@ -86,7 +86,7 @@ add a build script to package.json (`"build": "tsc"`).  Then you can use the dis
 ## Clerk
 * Setup a new clerk project
 * Assign a custom production domain
-* Create a clerk Oauth2 Provider: https://clerk.com/docs/advanced-usage/clerk-idp#when-do-the-tokens-expire
+* Create a [Clerk Oauth2 Provider](https://clerk.com/docs/advanced-usage/clerk-idp)
     * leave the callbackURL incorrect for now, we will update it later
     * update the client secret and name
 ```
@@ -96,6 +96,7 @@ curl -X POST https://api.clerk.com/v1/oauth_applications \
  -d '{"callback_url":"https://oauth-client.com/oauth2/callback", "name": "oauth_app_1", "scopes": "profile email"}'
 ```
 * Take the response from clerk and use it to update the authentication in the custom GPT Action
+![Action Oauth2 Config](readme-images/action-auth.png)
 * Take the Open API schema generated above, update the server addrss, and authentication endpoints, then paste it into the schema for the Action
 * wait for the draft to save successfully
 * refresh and you should now see the Callback URL
@@ -113,9 +114,17 @@ curl -X GET https://api.clerk.com/v1/oauth_applications \
  -H "Authorization: Bearer <CLERK_SECRET_KEY>"
 ```
 
+# Publishing a GPT
 ## ChatGPT Domain Verification
 In order to publish a GPT, you need to complete your Builder Profile including verifying your domain name.
 More info: https://help.openai.com/en/articles/8798878-building-and-publishing-a-gpt
+
+## Privacy Policy
+Before publishing a GPT, you will need to create a privacy policy.  If you don't have one, here is a prompt template:
+```
+Help me create a simple privacy policy to publish on my website for my custom GPT.  My company name is [company name] and my website is [website url].  The company will collect email addresses, but it will never sell this information to third parties.
+Ask me any questions you need to improve the privacy policy.
+```
 
 
 ## FAQ
