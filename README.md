@@ -1,156 +1,168 @@
 # Custom GPT Actions API with OAuth2 and Postgres
 
-## Description 
-Example OpenAI Custom GPT with user authentication and ability to read and write from a database.  
+A guide and cloneable template for creating an OpenAI ChatGPT Custom GPT with user authentication and database access.
 
-* Database: [Prisma](https://prisma.io) with [Neon](https://neon.tech) Serverless Postgres
-* Authentication: [Clerk.com](https://clerk.com) OAuth 2 server
-* Hosting: [Vercel](https://vercel.com)
+## Tech Stack
+- **Database**: [Prisma](https://prisma.io) with [Neon](https://neon.tech) Serverless Postgres
+- **Authentication**: [Clerk.com](https://clerk.com) OAuth 2.0
+- **Hosting**: [Vercel](https://vercel.com)
+- **Language**: TypeScript
+- **Package Manager**: pnpm
 
+## Prerequisites
+- Node.js 18+
+- pnpm
+- A custom domain name (required for Clerk configuration)
+- OpenAI API access
+- Clerk account
+- Neon database account
+- Vercel account (optional, for deployment)
 
-# Getting Started
+## Quick Start
 
-## Create a Custom GPT
-* [Creating a GPT | OpenAI Help Center](https://help.openai.com/en/articles/8554397-creating-a-gpt)
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   pnpm install
+   ```
+3. Set up environment variables:
+   ```bash
+   cp .env.example .env
+   ```
+4. Update the `.env` file with your credentials
+5. Initialize the database:
+   ```bash
+   npx prisma generate
+   npx prisma db push
+   ```
 
-## Custom Domain Name
-* you will need a custom domain name when configuring Clerk.
+## Detailed Setup Guide
 
-## Setup Clerk
-* create a new clerk project
-* Create a production instance and [assign a custom production domain](https://clerk-docs-git-setup-clerk-doc.clerkpreview.com/migrations-deployments/production)
-* Create a [Clerk Oauth2 Provider](https://clerk.com/docs/advanced-usage/clerk-idp)
-    * leave the callbackURL incorrect for now, we will update it later
-    * update the client secret and name
-```
-curl -X POST https://api.clerk.com/v1/oauth_applications \
- -H "Authorization: Bearer <CLERK_SECRET_KEY>"  \
- -H "Content-Type: application/json" \
- -d '{"callback_url":"https://oauth-client.com/oauth2/callback", "name": "oauth_app_1", "scopes": "profile email"}'
-```
-* The response from Clerk will have the information needed to configure authentication in the custom GPT Action
-* Take the Open API schema generated above, update the server addrss, and authentication endpoints, then paste it into the schema for the Action
-* wait for the draft to save successfully
-* refresh and you should now see the Callback URL
-* Copy the Callback URL and update the Clerk Oauth2 server
-```
-curl -X PATCH https://api.clerk.com/v1/oauth_applications/<oauth_application_id> \
- -H "Authorization: Bearer <CLERK_SECRET_KEY>"  \
- -H "Content-Type: application/json" \
- -d '{"callback_url":"https://oauth-client.com/oauth2/callback"}'
-```
+### 1. Create a Custom GPT
+1. Visit the [OpenAI GPT Builder](https://help.openai.com/en/articles/8554397-creating-a-gpt)
+2. Follow the setup wizard to create your GPT
+3. Configure the Actions section with the OpenAPI specification
 
-Verify with:
-```
-curl -X GET https://api.clerk.com/v1/oauth_applications \
- -H "Authorization: Bearer <CLERK_SECRET_KEY>"
-```
+### 2. Configure Clerk Authentication
 
-## Setup Neon
-* create a new Neon database
-* update the `DATABASE_URL` in the `.env` file
+1. Create a new Clerk project
+2. Set up a production instance with a custom domain
+3. Create an OAuth2 Provider:
+   ```bash
+   curl -X POST https://api.clerk.com/v1/oauth_applications \
+    -H "Authorization: Bearer <CLERK_SECRET_KEY>"  \
+    -H "Content-Type: application/json" \
+    -d '{
+      "callback_url": "https://oauth-client.com/oauth2/callback",
+      "name": "oauth_app_1",
+      "scopes": "profile email"
+    }'
+   ```
+4. Update the callback URL after receiving the OpenAPI schema:
+   ```bash
+   curl -X PATCH https://api.clerk.com/v1/oauth_applications/<oauth_application_id> \
+    -H "Authorization: Bearer <CLERK_SECRET_KEY>"  \
+    -H "Content-Type: application/json" \
+    -d '{"callback_url":"https://oauth-client.com/oauth2/callback"}'
+   ```
+5. Verify the configuration:
+   ```bash
+   curl -X GET https://api.clerk.com/v1/oauth_applications \
+    -H "Authorization: Bearer <CLERK_SECRET_KEY>"
+   ```
 
-## Install Packages
+### 3. Database Setup
 
-`pnpm install`
+1. Create a new Neon database
+2. Update the `DATABASE_URL` in your `.env` file
+3. Run database migrations:
+   ```bash
+   npx prisma generate
+   npx prisma db push
+   ```
 
-## Run Database Migrations
-`npx prisma generate`
-`npx prisma db push`
+### 4. Generate OpenAPI Specifications
 
-## Generate Open API Specs
+Use the [ActionsGPT](https://chatgpt.com/g/g-TYEliDU6A-actionsgpt) to generate OpenAPI specs based on your Prisma schema and code.
 
-Use the ActionsGPT created by OpenAI to create the Open API spec.
-https://chatgpt.com/g/g-TYEliDU6A-actionsgpt
+### 5. Deployment
 
-Here is the prompt:
+#### Option 1: Vercel (Recommended)
+- The project is configured for Vercel deployment
+- Use the [Vercel CLI](https://vercel.com/docs/deployments/overview#vercel-cli) for deployment
+- All `/api` routes are automatically converted to serverless functions
 
-Create an Open API spec based on the Prisma Schema and code snippet below.  OAuth2 is used for authentication.  The scopes are “profile”, "email".  The spec should be in YAML format.
-Prisma schema:
-```
-{YOUR PRISMA SCHEMA HERE}
-```
-code snippet:
-```typescript
-{YOUR CODE HERE}
-```
+#### Option 2: Conventional Node.js Server
+1. Add build script to `package.json`:
+   ```json
+   {
+     "scripts": {
+       "build": "tsc"
+     }
+   }
+   ```
+2. Build the project:
+   ```bash
+   pnpm build
+   ```
+3. Use the `dist` folder as your server root
 
-After it generates the spec, update the server URL, authorizationUrl, and tokenURL.
+## Development
 
+### Database Management
+- Generate Prisma client: `npx prisma generate`
+- Push schema changes: `npx prisma db push`
+- Format schema: `npx prisma format`
+- Create migration: `prisma migrate dev --name {name}`
+- Deploy migrations: `prisma migrate deploy`
+- Launch Prisma Studio: `npx prisma studio`
 
-## Deploy to Vercel
-* The project is setup to deploy to Vercel without any changes.  
-* Note, Vercel automatically turns everything in the /api folder into serverless functions
-* I suggest using the [Vercel CLI](https://vercel.com/docs/deployments/overview#vercel-cli) to deploy the project
+### Local Development
+- Run development server: `pnpm dev`
+- Note: `vercel dev` may have issues with `app.listen()` - use `pnpm dev` instead
 
-## Update and Test the GPT
-* update the Open API spec with the URL for your deployed API
-* test the GPT
+## Production Considerations
+
+Before deploying to production, consider implementing:
+- Comprehensive test suite
+- Robust error handling
+- Additional API endpoints
+- Improved API organization following best practices:
+  ```
+  src/
+  ├── controllers/
+  ├── routes/
+  └── api/
+  ```
+- Automated OpenAPI spec generation
+- Consider using [TSOA](https://tsoa-community.github.io/docs/getting-started.html)
 
 ## Privacy Policy
-* Before publishing a GPT, you will need to create a privacy policy.  If you don't have one, here is a prompt template:
 
-Help me create a simple privacy policy to publish on my website for my custom GPT.  My company name is [company name] and my |website is [website url].  The company will collect email addresses, but it will never sell this information to third parties  Ask me any questions you need to improve the privacy policy.
+Before publishing your GPT, create a privacy policy. Use this template prompt:
+```
+Help me create a simple privacy policy to publish on my website for my custom GPT. 
+My company name is [company name] and my website is [website url]. 
+The company will collect email addresses, but it will never sell this information to third parties.
+```
 
+## Publishing Your GPT
 
-# Publishing a GPT
-## ChatGPT Domain Verification
-In order to publish a GPT, you need to complete your Builder Profile including verifying your domain name.
-More info: https://help.openai.com/en/articles/8798878-building-and-publishing-a-gpt
+1. Complete your Builder Profile
+2. Verify your domain name
+3. Submit for review
 
+For more information, visit: [Building and Publishing a GPT](https://help.openai.com/en/articles/8798878-building-and-publishing-a-gpt)
 
+## Troubleshooting
 
-
-## FAQ
-* `vercel dev` is not working as expected.
-    run `pnpm dev`.  For some reason it tries to call app.listen() a second time despite the fact that it does not do this in production.
-* When deploying to vercel, there are type build errors related to Prisma.  
-    They are ignorable.  
-* How do I deploy this to a conventional Nodejs server?
-    add a build script to package.json (`"build": "tsc"`).  Then you can use the dist folder as the root folder for your server.
-* How do I use Prisma?
-`npx prisma generate` - this will generate the Prisma client
-`npx prisma db push` - this effectively runs migrations on the Neon serverless postgres database
-`npx prisma format` - this will help define foreign keys and enforce best practices
-`prisma migrate dev --name {name}` - this will create a migration file in the migrations folder.  You can use this to create a migration file.  The name is the name of the migration file.  The name should be in snake-case.
-`prisma migrate deploy` - this will run the migrations
-
-
-Note: What I am loving about Prisma is being able to generate the Types, restart my Typescript server, and boom, I have the types for free.  I can also use Prisma Studio to visually see the database schema and relationships.  It's a great tool for development.
-
-* How do I use Prisma Studio?
-`npx prisma studio` - this will open the Prisma Studio in your browser.  You can use this to visually see the database schema and relationships.
-
-
-
-# Next Steps for Production Deploy
-* This is a demo project.  It is not recommended to deploy to a production environment.  While building, I intentionally tried to keep things simple and avoid adding things like tests, error handling, and more.  I did not want to make this demo too complicated.  However, below are a few things I would recommend before a production deploy:
-    * Add tests
-    * Add error handling
-    * Add more endpoints
-    * Add more error handling
-    * Follow this Guide on a more Vercel friendly way to organize the API endpoints into files and folders
-        * https://www.prisma.io/blog/how-to-build-a-node-js-api-with-prisma-2-and-postgres-part-1-setting-up-the-development-environment-and-creating-the-database-schema   
-    * Alternative guide on a more standard Express structure
-        src/
-        │
-        ├── controllers/       # Functions to handle requests
-        │   ├── storeController.ts
-        │   ├── productController.ts
-        │   └── userController.ts
-        ├── routes/            # Route definitions
-        │   ├── storeRoutes.ts
-        │   ├── productRoutes.ts
-        │   └── userRoutes.ts
-        │
-        └── api/
-            └── index.ts  
-    * Automatically generate Open API specs
-    * consider using TSOA: https://tsoa-community.github.io/docs/getting-started.html
+- **Vercel dev issues**: Use `pnpm dev` instead
+- **Prisma type build errors on Vercel**: These are ignorable
+- **Database connection issues**: Verify your `DATABASE_URL` in `.env`
 
 ## Contributing
 
-PRs are welcome.  Please feel free to submit a PR or an issue.
+Contributions are welcome! Please feel free to submit a PR or create an issue.
 
 ## License
 
